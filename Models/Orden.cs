@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ejemplo.Models
 {
@@ -12,7 +13,7 @@ namespace Ejemplo.Models
         public string Foto { get; set; } = "";
         public decimal Costo { get; set; }
 
-        [DataType(dataType.date)]
+        [DataType(DataType.DateTime)]
         public DateTime Fecha { get; set; }
         public virtual Cliente Cliente { get; set; }
     }

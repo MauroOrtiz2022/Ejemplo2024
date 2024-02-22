@@ -1,8 +1,15 @@
+using Ejemplo.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddDbContext<MauroContext>((Options) =>
+{
+    Options.UseSqlServer(builder.Configuration.GetConnectionString("mauroAzure"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
