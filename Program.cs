@@ -1,3 +1,4 @@
+using Ejemplo.Helpers;
 using Ejemplo.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<MauroContext>((Options) =>
 {
     Options.UseSqlServer(builder.Configuration.GetConnectionString("mauroAzure"));
 });
+builder.Services.Configure<AzureStoreConfig>(builder.Configuration.GetSection("AzureStorage"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
