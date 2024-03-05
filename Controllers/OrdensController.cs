@@ -6,28 +6,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Ejemplo.Models;
-using Ejemplo.Helpers;
 //using Ejemplo.Context;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using System.Collections;
+using Ejemplo.Helpers;
+using Ejemplo.Models;
 
 namespace Ejemplo.Controllers
 {
     public class OrdensController : Controller
     {
         private readonly MauroContext _context;
-        private readonly AzureStoreConfig _config = null;
-        public OrdensController(MauroContext context)
+        private readonly AzureStoreConfig _config;
+        public OrdensController(MauroContext context, IOptions<AzureStoreConfig>config)
         {
             _context = context;
+            _config = config.Value;
         }
 
         // GET: Ordens
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Orden.ToListAsync());
+            return View(await _context.Orden.Include(e=>e.Cliente).ToListAsync());
         }
 
         // GET: Ordens/Details/5
@@ -37,8 +35,8 @@ namespace Ejemplo.Controllers
             {
                 return NotFound();
             }
-
             var orden = await _context.Orden
+                .Include(e=>e.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (orden == null)
             {
@@ -49,8 +47,10 @@ namespace Ejemplo.Controllers
         }
 
         // GET: Ordens/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var cliente = await _context.Cliente.ToListAsync();
+            ViewBag.Cliente = new SelectList(cliente, "Id", "NombreCliente");
             return View();
         }
 
@@ -59,21 +59,33 @@ namespace Ejemplo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Numero,Foto,Costo,Fecha")] Orden orden, ICollection<IFormFile>archivo)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Numero,Costo,Fecha,ClienteId")] Orden orden, IFormFile foto)
         {
-            if (ModelState.IsValid)
+            if ("Id,Nombre,Numero,Costo,Fecha,ClienteId.Id".Split(',').All(campo=>ModelState.ContainsKey(campo)))
             {
-                var foto = archivo.FirstOrDefault();
-                if (foto != null)
+                //var foto = archivo.FirstOrDefault();
+                if (foto == null)
                 {
-                    var nombre = $"{Guid.NewGuid()}.png";
-                    orden.Foto = await StorageHelper.SubirArchivo
-                        (foto.OpenReadStream(), nombre, _config);
+                    //var nombre = $"{Guid.NewGuid()}.png";
+                    //orden.Foto = await StorageHelper.SubirArchivo
+                        //(foto.OpenReadStream(), nombre, _config);
 
-                    _context.Add(orden);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }              
+                    //_context.Add(orden);
+                    //await _context.SaveChangesAsync();
+                    //return RedirectToAction(nameof(Index));
+
+                    orden.Foto = StorageHelper.URL_imagen_default;
+                }
+                else
+                {
+                    string extension = foto.FileName.Split(".")[1];
+                    string nombre = $"{Guid.NewGuid()}.{extension}";
+                    orden.Foto = await StorageHelper.SubirArchivo(foto.OpenReadStream(),nombre, _config);
+                }
+                _context.Set<Orden>().Add(orden);
+                _context.Entry(orden.Cliente).State = EntityState.Unchanged;
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
             return View(orden);
         }
@@ -132,12 +144,13 @@ namespace Ejemplo.Controllers
         // GET: Ordens/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Orden==null)
             {
                 return NotFound();
             }
 
             var orden = await _context.Orden
+                .Include(e=>e.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (orden == null)
             {
@@ -151,17 +164,24 @@ namespace Ejemplo.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
-        {
+        {                                  
+            if (_context.Orden == null)
+            {
+                return Problem("Entity set 'jaragongcontext.Orden' is null. ");
+            }
             var orden = await _context.Orden.FindAsync(id);
-            _context.Orden.Remove(orden);
+            if (orden != null) 
+            {
+                _context.Orden.Remove(orden);
+            }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-            //if (orden != null){_context.Orden.Remove(orden);}
         }
 
         private bool OrdenExists(int id)
         {
-            return _context.Orden.Any(e => e.Id == id);
+            return (_context.Orden?.Any(e => e.Id == id)).GetValueOrDefault();
+            
         }
     }
 }
