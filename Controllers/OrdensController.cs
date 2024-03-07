@@ -50,7 +50,7 @@ namespace Ejemplo.Controllers
         public async Task<IActionResult> Create()
         {
             var cliente = await _context.Cliente.ToListAsync();
-            ViewBag.Cliente = new SelectList(cliente, "Id", "NombreCliente");
+            ViewBag.Cliente = new SelectList(cliente, "Id", "Nombre");
             return View();
         }
 
