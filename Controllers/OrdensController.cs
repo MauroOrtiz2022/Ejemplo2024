@@ -59,9 +59,9 @@ namespace Ejemplo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Numero,Costo,Fecha,ClienteId")] Orden orden, IFormFile foto)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Numero,Costo,Fecha,Cliente")] Orden orden, IFormFile foto)
         {
-            if ("Id,Nombre,Numero,Costo,Fecha,ClienteId.Id".Split(',').All(campo=>ModelState.ContainsKey(campo)))
+            if ("Id,Nombre,Numero,Costo,Fecha,Cliente.Id".Split(',').All(campo=>ModelState.ContainsKey(campo)))
             {
                 //var foto = archivo.FirstOrDefault();
                 if (foto == null)
