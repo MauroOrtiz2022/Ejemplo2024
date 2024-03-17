@@ -3,8 +3,12 @@
 @{
     ViewData["Title"] = "Create";
 }
-
-<h1>Create</h1>
+<style>
+    body {
+        background-color: lightcoral;
+    }
+</style>
+<h1>Creacion</h1>
 
 <h4>Orden</h4>
 <hr />
@@ -36,10 +40,7 @@
                 <label asp-for="Fecha" class="control-label"></label>
                 <input asp-for="Fecha" class="form-control" />
                 <span asp-validation-for="Fecha" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+            </div>            
             <div class="form-group form-crear-orden-foto">
                 <img id="foto-perfil" class="perfil-foto" src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
             </div>
@@ -58,6 +59,9 @@
 
                     </select>
                 }
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
