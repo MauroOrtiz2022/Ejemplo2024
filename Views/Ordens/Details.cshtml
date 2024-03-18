@@ -42,8 +42,11 @@
             @Html.DisplayNameFor(model => model.Foto)
         </dt>
         <dd class="col-sm-10">
-            <img src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
+            @Html.DisplayFor(model => model.Foto)
         </dd>
+        <dd class="col-sm-10">
+            <img src="@Model.Foto" width="200" height="200" />
+        </dd>        
     </dl>
 </div>
 <div>

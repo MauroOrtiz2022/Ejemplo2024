@@ -50,7 +50,10 @@
                 @Html.DisplayFor(modelItem => item.Fecha)
             </td>
             <td>
-                    <img src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
+                    @{
+                        var urlPath = Html.DisplayFor(modelItem => item.Foto);
+                    }
+                    <img src="@urlPath" alt="Descripción de la imagen">
                     @*@Html.DisplayFor(modelItem => item.Foto)*@
             </td>
             <td>

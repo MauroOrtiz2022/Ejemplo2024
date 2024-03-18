@@ -62,18 +62,9 @@ namespace Ejemplo.Controllers
         public async Task<IActionResult> Create([Bind("Id,Nombre,Numero,Foto,Costo,Fecha,Cliente")] Orden orden, IFormFile foto)
         {
             if ("Nombre,Numero,Foto,Costo,Fecha,Cliente.Id".Split(',').All(campo=>ModelState.ContainsKey(campo)))
-            {
-                //var foto = archivo.FirstOrDefault();
+            {                
                 if (foto == null)
-                {
-                    //var nombre = $"{Guid.NewGuid()}.png";
-                    //orden.Foto = await StorageHelper.SubirArchivo
-                        //(foto.OpenReadStream(), nombre, _config);
-
-                    //_context.Add(orden);
-                    //await _context.SaveChangesAsync();
-                    //return RedirectToAction(nameof(Index));
-
+                {                    
                     orden.Foto = StorageHelper.URL_imagen_default;
                 }
                 else
@@ -93,18 +84,18 @@ namespace Ejemplo.Controllers
         // GET: Ordens/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Orden == null)
             {
                 return NotFound();
             }
-
+            var cliente = await _context.Cliente.ToListAsync();
+            ViewBag.Cliente = new SelectList(cliente, "Id", "Nombre");
             var orden = await _context.Orden.FindAsync(id);
             if (orden == null)
             {
                 return NotFound();
             }
-            var cliente = await _context.Cliente.ToListAsync();
-            ViewBag.Cliente = new SelectList(cliente, "Id", "Nombre");            
+            
             return View(orden);
         }
 
@@ -118,9 +109,8 @@ namespace Ejemplo.Controllers
             if (id != orden.Id)
             {
                 return NotFound();
-            }
-
-            if ("Nombre,Numero,Foto,Costo,Fecha,Cliente.Id".Split(',').All(campo => ModelState.ContainsKey(campo)))
+            }                          
+            try
             {
                 if (foto == null)
                 {
@@ -128,28 +118,26 @@ namespace Ejemplo.Controllers
                 }
                 else
                 {
-                    string extension = foto.FileName.Split(".")[1];
+                    string extension = foto.FileName.Split('.')[1];
                     string nombre = $"{Guid.NewGuid()}.{extension}";
                     orden.Foto = await StorageHelper.SubirArchivo(foto.OpenReadStream(), nombre, _config);
                 }
-                try
+                _context.Update(orden);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OrdenExists(orden.Id))
                 {
-                    _context.Update(orden);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!OrdenExists(orden.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
+            }
                 return RedirectToAction(nameof(Index));
-            }            
+                        
             return View(orden);
         }
 

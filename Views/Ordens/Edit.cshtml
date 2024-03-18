@@ -39,13 +39,14 @@
             </div>
             <div class="form-group form-crear-orden-clientes">
                 <label class="control-label">Cliente</label>
-                @if ((ViewBag.Cliente as SelectList).Count() > 0)
+                @if (ViewBag != null && ViewBag.Cliente is SelectList && (ViewBag.Cliente as SelectList).Count() > 0)
                 {
                     @Html.DropDownList("Cliente.Id", ViewBag.Cliente as SelectList)
                 }
-                @if ((ViewBag.Cliente as SelectList).Count() == 0)
+                else
                 {
-                    <select required disabled>
+                    <select>
+                        <option disabled selected>No hay Clientes disponibles</option>
                     </select>
                 }
             </div>
@@ -53,9 +54,8 @@
                 <img id="foto-perfil" class="perfil-foto" src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
             </div>
             <div class="form-group form-crear-orden-archivo">
-                <input name="foto" class="form-control" id="archivo" type="file" />
-            </div>
-            
+                <input name="Foto" class="form-control" id="archivo" type="file" />
+            </div>                        
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
