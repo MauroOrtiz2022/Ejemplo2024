@@ -103,6 +103,8 @@ namespace Ejemplo.Controllers
             {
                 return NotFound();
             }
+            var cliente = await _context.Cliente.ToListAsync();
+            ViewBag.Cliente = new SelectList(cliente, "Id", "Nombre");            
             return View(orden);
         }
 
@@ -111,15 +113,25 @@ namespace Ejemplo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Numero,Foto,Costo,Fecha")] Orden orden)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Numero,Foto,Costo,Fecha,Cliente")] Orden orden, IFormFile foto)
         {
             if (id != orden.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if ("Nombre,Numero,Foto,Costo,Fecha,Cliente.Id".Split(',').All(campo => ModelState.ContainsKey(campo)))
             {
+                if (foto == null)
+                {
+                    orden.Foto = StorageHelper.URL_imagen_default;
+                }
+                else
+                {
+                    string extension = foto.FileName.Split(".")[1];
+                    string nombre = $"{Guid.NewGuid()}.{extension}";
+                    orden.Foto = await StorageHelper.SubirArchivo(foto.OpenReadStream(), nombre, _config);
+                }
                 try
                 {
                     _context.Update(orden);
@@ -137,7 +149,7 @@ namespace Ejemplo.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
+            }            
             return View(orden);
         }
 

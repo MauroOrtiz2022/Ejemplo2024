@@ -44,13 +44,14 @@
                 @Html.DisplayFor(modelItem => item.Numero)
             </td>            
             <td>
-                @Html.DisplayFor(modelItem => item.Costo)
+                    @Html.DisplayFor(modelItem => item.Costo)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Fecha)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Foto)
+                    <img src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
+                    @*@Html.DisplayFor(modelItem => item.Foto)*@
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
