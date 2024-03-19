@@ -14,7 +14,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Nombre" class="control-label"></label>
@@ -54,12 +54,11 @@
                 }
             </div>
             <div class="form-group form-crear-orden-foto">
-                <img id="foto-perfil" class="perfil-foto" src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG style="width: 70%; height: 70%;" />
+                <img id="foto-perfil" width="200" height="200" class="perfil-foto" src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
             </div>
             <div class="form-group form-crear-orden-archivo">
                 <input name="foto" class="form-control" id="archivo" type="file" />
             </div>
-            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

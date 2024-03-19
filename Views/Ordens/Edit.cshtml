@@ -14,7 +14,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -51,7 +51,7 @@
                 }
             </div>
             <div class="form-group form-crear-orden-foto">
-                <img id="foto-perfil" class="perfil-foto" src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
+                <img id="foto-perfil" width="200" height="200" class="perfil-foto" src="https://tacos.blob.core.windows.net/contenedor-taquitos/Captura.PNG" />
             </div>
             <div class="form-group form-crear-orden-archivo">
                 <input name="Foto" class="form-control" id="archivo" type="file" />
@@ -70,3 +70,19 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+<script>
+    window.addEventListener('load', () => {
+        console.log('loaded');
+        let foto_perfil = document.getElementById('foto-perfil');
+        let reader = new FileReader();
+        let input = document.getElementById('archivo');
+        input.addEventListener('input', (e) => {
+            console.log('input changed');
+            reader.readAsDataURL(input.files[0]);
+        });
+        reader.onload = (e) => {
+            console.log('img reloaded');
+            foto_perfil.setAttribute('src', e.target.result);
+        }
+    })
+</script>
