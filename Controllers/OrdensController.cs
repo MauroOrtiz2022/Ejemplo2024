@@ -106,38 +106,43 @@ namespace Ejemplo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Numero,Foto,Costo,Fecha,Cliente")] Orden orden, IFormFile foto)
         {
+
             if (id != orden.Id)
             {
                 return NotFound();
-            }                          
-            try
-            {
-                if (foto == null)
-                {
-                    orden.Foto = StorageHelper.URL_imagen_default;
-                }
-                else
-                {
-                    string extension = foto.FileName.Split('.')[1];
-                    string nombre = $"{Guid.NewGuid()}.{extension}";
-                    orden.Foto = await StorageHelper.SubirArchivo(foto.OpenReadStream(), nombre, _config);
-                }
-                _context.Update(orden);
-                await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            if ("Nombre,Numero,Foto,Costo,Fecha,Cliente.Id".Split(',').All(campo => ModelState.ContainsKey(campo)))
             {
-                if (!OrdenExists(orden.Id))
+                var datos = await _context.Cliente.FindAsync(orden.Cliente.Id);
+                orden.Cliente = datos;
+                try
                 {
-                    return NotFound();
+                    if (foto == null)
+                    {
+                        orden.Foto = StorageHelper.URL_imagen_default;
+                    }
+                    else
+                    {
+                        string extension = foto.FileName.Split('.')[1];
+                        string nombre = $"{Guid.NewGuid()}.{extension}";
+                        orden.Foto = await StorageHelper.SubirArchivo(foto.OpenReadStream(), nombre, _config);
+                    }
+                    _context.Update(orden);
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!OrdenExists(orden.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-            }
                 return RedirectToAction(nameof(Index));
-                        
+            }           
             return View(orden);
         }
 
